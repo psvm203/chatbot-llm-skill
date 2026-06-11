@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-#[derive(Debug, Serialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct DeepseekRequest {
     pub messages: Vec<Message>,
@@ -20,20 +20,20 @@ pub struct DeepseekRequest {
     pub top_logprobs: Option<u32>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Serialize)]
 pub struct Message {
     pub content: String,
     pub role: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct Thinking {
     #[serde(rename = "type")]
     pub thinking_type: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct ResponseFormat {
     #[serde(rename = "type")]
