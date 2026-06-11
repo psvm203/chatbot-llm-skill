@@ -32,7 +32,7 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
         ],
         model: "deepseek-v4-flash".to_owned(),
         thinking: Thinking {
-            thinking_type: "enabled".to_owned(),
+            thinking_type: "disabled".to_owned(),
         },
         reasoning_effort: "high".to_owned(),
         max_tokens: 4096,
