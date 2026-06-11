@@ -5,6 +5,6 @@ mod router;
 use worker::*;
 
 #[event(fetch)]
-async fn fetch(request: Request, _env: Env, _ctx: Context) -> Result<Response> {
-    router::dispatch(request).await
+async fn fetch(request: Request, env: Env, _ctx: Context) -> Result<Response> {
+    router::dispatch(request, env).await
 }
