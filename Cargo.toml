@@ -8,5 +8,6 @@ authors = ["psvm203 <psvm203@proton.me>"]
 crate-type = ["cdylib"]
 
 [dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
 worker = { version = "0.8" }
 worker-macros = { version = "0.8" }
