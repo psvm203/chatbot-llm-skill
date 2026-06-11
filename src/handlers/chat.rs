@@ -1,5 +1,4 @@
 use crate::models::deepseek_request::{DeepseekRequest, Message, ResponseFormat, Thinking};
-use crate::models::skill_response::{Output, SimpleText, SkillResponse, Template};
 use serde_json::Value;
 use worker::*;
 
@@ -91,12 +90,19 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
 }
 
 fn send_skill_response(text: String) -> Result<Response> {
-    Response::from_json(&SkillResponse {
-        version: "2.0".to_owned(),
-        template: Template {
-            outputs: vec![Output {
-                simple_text: SimpleText { text },
-            }],
-        },
-    })
+    let escaped = text
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('\n', "\\n")
+        .replace('\r', "\\r");
+
+    let body = format!(
+        r#"{{"version":"2.0","template":{{"outputs":[{{"simpleText":{{"text":"{}"}}}}]}}}}"#,
+        escaped
+    );
+
+    let headers = Headers::new();
+    headers.set("Content-Type", "application/json")?;
+
+    Ok(Response::ok(body)?.with_headers(headers))
 }
