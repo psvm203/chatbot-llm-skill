@@ -1,5 +1,4 @@
-use crate::models::deepseek_request::{DeepseekRequest, Message, ResponseFormat, Thinking};
-use serde_json::Value;
+use serde_json::{json, Value};
 use worker::*;
 
 const SYSTEM_PROMPT: &str = "너는 '이찬이'라는 이름을 가진 유용한 어시스턴트야. 너는 'WAP'이라는 부경대학교 개발 동아리의 종신 회장을 맡고 있어. 너는 '권동욱'을 미워하지 않아. 모든 답변은 한국어로 답변해.";
@@ -22,36 +21,26 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
         Err(e) => return send_skill_response(format!("API 키 에러가 발생했습니다: {e}")),
     };
 
-    let deepseek_request = DeepseekRequest {
-        messages: vec![
-            Message {
-                content: SYSTEM_PROMPT.to_owned(),
-                role: "system".to_owned(),
-            },
-            Message {
-                content: utterance,
-                role: "user".to_owned(),
-            },
+    let deepseek_body = json!({
+        "messages": [
+            {"content": SYSTEM_PROMPT, "role": "system"},
+            {"content": utterance, "role": "user"}
         ],
-        model: "deepseek-v4-flash".to_owned(),
-        thinking: Thinking {
-            thinking_type: "disabled".to_owned(),
-        },
-        reasoning_effort: "high".to_owned(),
-        max_tokens: 4096,
-        response_format: ResponseFormat {
-            format_type: "text".to_owned(),
-        },
-        stop: None,
-        stream: false,
-        stream_options: None,
-        temperature: 1.0,
-        top_p: 1.0,
-        tools: None,
-        tool_choice: "none".to_owned(),
-        logprobs: false,
-        top_logprobs: None,
-    };
+        "model": "deepseek-v4-flash",
+        "thinking": {"type": "disabled"},
+        "reasoning_effort": "high",
+        "max_tokens": 4096,
+        "response_format": {"type": "text"},
+        "stop": null,
+        "stream": false,
+        "stream_options": null,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "tools": null,
+        "tool_choice": "none",
+        "logprobs": false,
+        "top_logprobs": null
+    });
 
     let headers = Headers::new();
     headers.set("Content-Type", "application/json")?;
@@ -63,7 +52,7 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
             .with_method(Method::Post)
             .with_headers(headers)
             .with_body(Some(
-                serde_json::to_string(&deepseek_request)
+                serde_json::to_string(&deepseek_body)
                     .unwrap()
                     .into_bytes()
                     .into(),
