@@ -69,7 +69,8 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
         return send_skill_response(format!("DeepSeek API 오류: {}", error_text));
     }
 
-    let ai_text: String = match fetch_response.json::<Value>().await {
+    let response_text = fetch_response.text().await?;
+    let ai_text: String = match serde_json::from_str::<Value>(&response_text) {
         Ok(body) => body
             .get("choices")
             .and_then(|c| c.get(0))
@@ -79,7 +80,7 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
             .unwrap_or("응답을 받지 못했습니다.")
             .to_owned(),
         Err(e) => {
-            return send_skill_response(format!("DeepSeek 응답 파싱 오류가 발생했습니다: {e}"))
+            return send_skill_response(format!("DeepSeek 응답 파싱 오류: {e}\n응답 바디: {response_text}"))
         }
     };
 
