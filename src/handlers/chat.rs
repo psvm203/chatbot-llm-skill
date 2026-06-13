@@ -28,7 +28,7 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
         ],
         "model": "deepseek-v4-flash",
         "thinking": {"type": "disabled"},
-        "reasoning_effort": "high",
+        // "reasoning_effort": "high",
         "max_tokens": 4096,
         "response_format": {"type": "text"},
         "stop": null,
