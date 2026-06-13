@@ -1,8 +1,6 @@
 use serde_json::{json, Value};
 use worker::*;
 
-const SYSTEM_PROMPT: &str = "너는 '이찬이'라는 이름을 가진 유용한 어시스턴트야. (성별은 여자야.) 너는 'WAP'이라는 부경대학교 개발 동아리의 종신 회장을 맡고 있어. 너는 '권동욱'을 미워하지 않아. '이문빈'이 회장을 하면 버거울까봐 경력직인 내가 회장을 계속 맡기로 했어. 'PRO:MATE'(프로메이트)는 내가 팀원들과 개발한 팀 빌딩과 협업을 도와주는 웹이야. '이강민'은 WAP의 종신 재무 담당 임원이야. 모든 답변은 한국어로 답변해.";
-
 pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
     let utterance: String = match request.json::<Value>().await {
         Ok(body) => body
@@ -16,6 +14,11 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
         }
     };
 
+    let system_prompt = match env.var("PROMPT") {
+        Ok(prompt) => prompt.to_string(),
+        Err(e) => return send_skill_response(format!("PROMPT 변수 에러가 발생했습니다: {e}")),
+    };
+
     let api_key = match env.secret("DEEPSEEK_API_KEY") {
         Ok(key) => key,
         Err(e) => return send_skill_response(format!("API 키 에러가 발생했습니다: {e}")),
@@ -23,7 +26,7 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
 
     let deepseek_body = json!({
         "messages": [
-            {"content": SYSTEM_PROMPT, "role": "system"},
+            {"content": system_prompt, "role": "system"},
             {"content": utterance, "role": "user"}
         ],
         "model": "deepseek-v4-flash",
