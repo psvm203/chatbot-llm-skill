@@ -16,7 +16,9 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
 
     let system_prompt = match env.var("PROMPT") {
         Ok(prompt) => prompt.to_string(),
-        Err(e) => return send_skill_response(format!("PROMPT 변수 에러가 발생했습니다: {e}"), None),
+        Err(e) => {
+            return send_skill_response(format!("PROMPT 변수 에러가 발생했습니다: {e}"), None)
+        }
     };
 
     let api_key = match env.secret("DEEPSEEK_API_KEY") {
@@ -33,7 +35,7 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
         "thinking": {"type": "disabled"},
         // "reasoning_effort": "high",
         "max_tokens": 4096,
-        "response_format": {"type": "text"},
+        "response_format": {"type": "json_object"},
         "stop": null,
         "stream": false,
         "stream_options": null,
