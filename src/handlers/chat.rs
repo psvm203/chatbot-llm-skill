@@ -61,6 +61,11 @@ pub async fn handle(mut request: Request, env: Env) -> Result<Response> {
 
     let mut fetch_response = Fetch::Request(fetch_request).send().await?;
 
+    if fetch_response.status_code() != 200 {
+        let error_text = fetch_response.text().await?;
+        return send_skill_response(format!("DeepSeek API 오류: {}", error_text));
+    }
+
     let ai_text: String = match fetch_response.json::<Value>().await {
         Ok(body) => body
             .get("choices")
